@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ใบส่งซ่อมรถยนต์เช่า - กองรถยนต์หลวง (มาตรฐาน 100%)</title>
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- 🛠️ CONTROL PANEL (Sidebar) -->
+        <aside class="sidebar no-print">
+            <div class="sidebar-header">
+                <div class="badge-tag">แบบฟอร์มมาตรฐานกองรถยนต์หลวง</div>
+                <h2>ใบส่งซ่อมรถยนต์เช่า</h2>
+                <p class="subtitle">ระบบสร้างเอกสาร US Legal 8.5" × 14" ตรงตามต้นฉบับ 100%</p>
+            </div>
+
+            <!-- Primary Export Action Buttons -->
+            <div class="export-actions-box">
+                <button type="button" class="btn-primary-action btn-word" onclick="openInWord()">
+                    <span class="btn-icon">📝</span>
+                    <div class="btn-text-wrap">
+                        <strong>เปิดใน Microsoft Word ทันที</strong>
+                        <span>สร้างไฟล์ .docx ต้นฉบับ 100% และเปิดตรวจทาน</span>
+                    </div>
+                </button>
+                <button type="button" class="btn-secondary-action" onclick="downloadDocx()">
+                    <span class="btn-icon">💾</span> ดาวน์โหลดไฟล์ Word (.docx)
+                </button>
+                <button type="button" class="btn-save-history" onclick="saveCurrentRecord(true)">
+                    <span class="btn-icon">🗂️</span> บันทึกข้อมูลเก็บไว้ในประวัติ
+                </button>
+            </div>
+
+            <!-- Quick Template / Profiles -->
+            <div class="panel-section">
+                <label class="section-label">⚡ ข้อมูลด่วน (Quick Presets)</label>
+                <div class="preset-buttons">
+                    <button type="button" class="btn-preset active" onclick="loadPreset('jitlada')">
+                        🚐 รร.จิตรลดา (1816)
+                    </button>
+                    <button type="button" class="btn-preset" onclick="loadPreset('empty')">
+                        📄 ล้างเป็นแบบฟอร์มว่าง
+                    </button>
+                </div>
+            </div>
+
+            <form id="repairForm" onsubmit="return false;">
+                <!-- ส่วนที่ 1: ข้อมูลรถส่งซ่อม -->
+                <div class="panel-section">
+                    <div class="section-title-bar">
+                        <span class="icon">🚗</span> 1. ข้อมูลรถส่งซ่อม
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>ประเภทรถยนต์</label>
+                        <div class="segmented-control">
+                            <label><input type="radio" name="carType" value="รถเก๋ง" onchange="updatePreview()"> รถเก๋ง</label>
+                            <label><input type="radio" name="carType" value="รถปิคอัพ" onchange="updatePreview()"> ปิคอัพ</label>
+                            <label><input type="radio" name="carType" value="รถตู้" checked onchange="updatePreview()"> รถตู้</label>
+                            <label><input type="radio" name="carType" value="บรรทุก" onchange="updatePreview()"> บรรทุก</label>
+                        </div>
+                    </div>
+
+                    <div class="form-row two-cols">
+                        <div class="form-group">
+                            <label>ยี่ห้อรถยนต์</label>
+                            <input type="text" id="inp-brand" value="TOYOTA" oninput="updatePreview()">
+                        </div>
+                        <div class="form-group">
+                            <label>รุ่นรถ</label>
+                            <input type="text" id="inp-model" value="COMMUTER" oninput="updatePreview()">
+                        </div>
+                    </div>
+
+                    <div class="form-row two-cols">
+                        <div class="form-group">
+                            <label>ทะเบียนรถ</label>
+                            <select id="inp-license" onchange="autoSelectDriver(); updatePreview()">
+                                <option value="">-- เลือกทะเบียนรถ --</option>
+                                <option value="ส.น.ว. 1816" selected>ส.น.ว. 1816</option>
+                                <option value="ส.น.ว. 1817">ส.น.ว. 1817</option>
+                                <option value="ส.น.ว. 1818">ส.น.ว. 1818</option>
+                                <option value="ส.น.ว. 1819">ส.น.ว. 1819</option>
+                                <option value="ส.น.ว. 1820">ส.น.ว. 1820</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>เลขไมล์ (กม.)</label>
+                            <input type="text" id="inp-mileage" value="19,838" oninput="updatePreview()">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>บริษัท/ห้างร้านที่ดำเนินการ</label>
+                        <input type="text" id="inp-garage" list="garage-list" value="ศูนย์โตโยต้าวรจักรยนต์ สาขาวิสุทธิกษัตริย์" oninput="updatePreview()">
+                        <datalist id="garage-list">
+                            <option value="ศูนย์โตโยต้าวรจักรยนต์ สาขาวิสุทธิกษัตริย์">
+                            <option value="ศูนย์โตโยต้าบัสส์ สาขาเกษตร-นวมินทร์">
+                            <option value="ศูนย์โตโยต้ากรุงเทพยนต์ สาขาพระราม 9">
+                        </datalist>
+                    </div>
+
+                    <div class="form-row two-cols">
+                        <div class="form-group">
+                            <label>หน่วยงานที่ส่งซ่อม</label>
+                            <input type="text" id="inp-department" value="โรงเรียนจิตรลดา" oninput="updatePreview()">
+                        </div>
+                        <div class="form-group">
+                            <label>เบอร์โทรศัพท์</label>
+                            <input type="text" id="inp-phone" value="092-225-4529" oninput="updatePreview()">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>วันที่แจ้งซ่อม</label>
+                        <input type="date" id="inp-date" onchange="updatePreview()">
+                    </div>
+                </div>
+
+                <!-- ส่วนที่ 2: รายการแจ้งซ่อม -->
+                <div class="panel-section">
+                    <div class="section-title-bar">
+                        <span class="icon">🔧</span> 2. รายการแจ้งซ่อม / ชำรุด (1–5)
+                    </div>
+                    
+                    <div class="quick-tags">
+                        <span class="tag-title">แท็กรายการด่วน:</span>
+                        <button type="button" class="btn-tag" onclick="addQuickItem('เปลี่ยนน้ำมันเครื่อง')">+ น้ำมันเครื่อง</button>
+                        <button type="button" class="btn-tag" onclick="addQuickItem('เปลี่ยนกรองน้ำมันเครื่อง')">+ กรองน้ำมันเครื่อง</button>
+                        <button type="button" class="btn-tag" onclick="addQuickItem('สลับยาง จำนวน 4 เส้น')">+ สลับยาง 4 เส้น</button>
+                        <button type="button" class="btn-tag" onclick="addQuickItem('เช็กระยะและตรวจสภาพทั่วไป')">+ เช็กระยะ</button>
+                    </div>
+
+                    <div class="item-inputs">
+                        <div class="item-row">
+                            <span class="num">1.</span>
+                            <input type="text" id="inp-item-1" value="เปลี่ยนน้ำมันเครื่อง" oninput="updatePreview()">
+                        </div>
+                        <div class="item-row">
+                            <span class="num">2.</span>
+                            <input type="text" id="inp-item-2" value="เปลี่ยนกรองน้ำมันเครื่อง" oninput="updatePreview()">
+                        </div>
+                        <div class="item-row">
+                            <span class="num">3.</span>
+                            <input type="text" id="inp-item-3" value="สลับยาง จำนวน 4 เส้น" oninput="updatePreview()">
+                        </div>
+                        <div class="item-row">
+                            <span class="num">4.</span>
+                            <input type="text" id="inp-item-4" value="" oninput="updatePreview()" placeholder="ข้อ 4 (ถ้ามี)">
+                        </div>
+                        <div class="item-row">
+                            <span class="num">5.</span>
+                            <input type="text" id="inp-item-5" value="" oninput="updatePreview()" placeholder="ข้อ 5 (ถ้ามี)">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ส่วนที่ 3: รถทดแทน -->
+                <div class="panel-section">
+                    <div class="section-title-bar flex-between">
+                        <span><span class="icon">🔄</span> 3. ข้อมูลรถทดแทน</span>
+                        <label class="switch-label">
+                            <input type="checkbox" id="chk-has-replacement" onchange="toggleReplacementCar()"> มีรถทดแทน
+                        </label>
+                    </div>
+
+                    <div id="replacement-fields" class="sub-form hidden">
+                        <div class="form-row two-cols">
+                            <div class="form-group">
+                                <label>ยี่ห้อ</label>
+                                <input type="text" id="inp-rep-brand" placeholder="ยี่ห้อ" oninput="updatePreview()">
+                            </div>
+                            <div class="form-group">
+                                <label>รุ่น</label>
+                                <input type="text" id="inp-rep-model" placeholder="รุ่น" oninput="updatePreview()">
+                            </div>
+                        </div>
+                        <div class="form-row two-cols">
+                            <div class="form-group">
+                                <label>ทะเบียนรถทดแทน</label>
+                                <input type="text" id="inp-rep-license" placeholder="ทะเบียน" oninput="updatePreview()">
+                            </div>
+                            <div class="form-group">
+                                <label>เลขไมล์รถทดแทน</label>
+                                <input type="text" id="inp-rep-mileage" placeholder="เลขไมล์" oninput="updatePreview()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ส่วนที่ 4: เจ้าหน้าที่ & หมายเหตุ -->
+                <div class="panel-section">
+                    <div class="section-title-bar">
+                        <span class="icon">✍️</span> 4. เจ้าหน้าที่นำรถเข้าซ่อม & หมายเหตุ
+                    </div>
+                    <div class="form-group">
+                        <label>ชื่อ จนท. นำรถเข้าซ่อม</label>
+                        <input type="text" id="inp-sender-name" list="sender-list" value="นันทกา เสาวรส" placeholder="เลือกหรือพิมพ์ชื่อ จนท." oninput="updatePreview()">
+                        <datalist id="sender-list">
+                            <option value="นันทกา เสาวรส">
+                            <option value="จินฑาทิพทย์ สว่างเมฆ">
+                            <option value="สุรินทร์ เพชรแท้">
+                            <option value="แกม โสนาพูน">
+                            <option value="จุมพล ดุษฎีพฤฒิพันธุ์">
+                            <option value="อดิเรก จันทร์โฮ้วมณี">
+                        </datalist>
+                    </div>
+                    <div class="form-group">
+                        <label>วันที่ส่งรถเข้าซ่อม</label>
+                        <input type="date" id="inp-send-date" value="2026-04-10" onchange="autoSelectDriver(); updatePreview()">
+                    </div>
+                    <div class="form-group">
+                        <label>หมายเหตุ 1</label>
+                        <input type="text" id="inp-note1" value="" oninput="updatePreview()">
+                    </div>
+                    <div class="form-group">
+                        <label>หมายเหตุ 2</label>
+                        <input type="text" id="inp-note2" value="" oninput="updatePreview()">
+                    </div>
+                </div>
+
+                <!-- ส่วนที่ 5: แนบรูปภาพหน้า 2 เป็นต้นไป (รองรับหลายรูป) -->
+                <div class="panel-section">
+                    <div class="section-title-bar flex-between">
+                        <span><span class="icon">📸</span> 5. รูปภาพแนบ (หน้า 2+)</span>
+                        <label class="switch-label">
+                            <input type="checkbox" id="chk-include-page2" checked onchange="renderPhotoPages()"> แสดงหน้าแนบรูป
+                        </label>
+                    </div>
+
+                    <div id="photo-upload-controls">
+                        <label class="multi-upload-dropzone" for="inp-photos">
+                            <span class="drop-icon">➕</span>
+                            <strong>คลิกเลือกรูปภาพ (เลือกพร้อมกันได้หลายรูป)</strong>
+                            <small>รองรับ 5–6 รูป หรือมากกว่า • จัดเรียง 2 คอลัมน์อัตโนมัติ</small>
+                            <input type="file" id="inp-photos" accept="image/*" multiple onchange="handleMultiPhotoUpload(this)" style="display:none;">
+                        </label>
+
+                        <div class="photo-toolbar">
+                            <span id="photo-count-badge" class="count-badge">แนบแล้ว 0 รูป</span>
+                            <button type="button" class="btn-clear-all" onclick="clearAllPhotos()">ล้างรูปทั้งหมด</button>
+                        </div>
+
+                        <div id="photo-list" class="photo-list"></div>
+                    </div>
+                </div>
+
+                <!-- Web Print Button -->
+                <div class="action-buttons">
+                    <button type="button" class="btn-print" onclick="printAndSave()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                        พิมพ์ตรงผ่านเบราว์เซอร์ (บันทึกประวัติอัตโนมัติ)
+                    </button>
+                </div>
+
+                <!-- ส่วนที่ 6: ประวัติการส่งซ่อมที่บันทึกไว้ -->
+                <div class="panel-section" style="margin-top: 1.25rem;">
+                    <div class="section-title-bar flex-between">
+                        <span><span class="icon">📚</span> 6. ประวัติที่บันทึกไว้</span>
+                        <span id="history-count-badge" class="count-badge">0 รายการ</span>
+                    </div>
+                    <div id="history-list" class="history-list">
+                        <div class="history-empty">ยังไม่มีข้อมูลที่บันทึกไว้</div>
+                    </div>
+                </div>
+            </form>
+        </aside>
+
+        <!-- 📄 LIVE PREVIEW DESK (Official 100% Match) -->
+        <main class="preview-desk">
+            <div class="preview-toolbar no-print">
+                <div class="toolbar-info">
+                    <span class="live-dot"></span>
+                    <strong>พรีวิวแบบฟอร์มมาตรฐาน (F4: 8.5" × 13")</strong>
+                </div>
+                <div class="toolbar-actions">
+                    <div class="zoom-group" title="ปรับขนาดตัวอักษรเมนูด้านซ้าย">
+                        <span class="zoom-label">เมนู</span>
+                        <button type="button" class="zoom-btn" onclick="stepUiZoom(-0.1)">A-</button>
+                        <span id="ui-zoom-readout" class="zoom-readout">100%</span>
+                        <button type="button" class="zoom-btn" onclick="stepUiZoom(0.1)">A+</button>
+                    </div>
+                    <div class="zoom-group" title="ซูมแผ่นกระดาษพรีวิว (ไม่กระทบขนาดตอนพิมพ์จริง)">
+                        <span class="zoom-label">กระดาษ</span>
+                        <button type="button" class="zoom-btn" onclick="stepPaperZoom(-0.1)">−</button>
+                        <span id="paper-zoom-readout" class="zoom-readout">100%</span>
+                        <button type="button" class="zoom-btn" onclick="stepPaperZoom(0.1)">+</button>
+                        <button type="button" class="zoom-btn zoom-fit" onclick="fitPaperToScreen()">พอดีจอ</button>
+                    </div>
+                    <button type="button" class="btn-tool btn-db-open" onclick="openDbModal()">🗄️ ฐานข้อมูลส่งซ่อม</button>
+                    <button type="button" class="btn-tool" onclick="openInWord()">📝 เปิดใน Word</button>
+                    <button type="button" class="btn-tool" onclick="printAndSave()">🖨️ สั่งพิมพ์</button>
+                </div>
+            </div>
+
+            <div class="sheet-scroller">
+                <div class="pages-stack">
+                <!-- PAGE 1: DOCUMENT SHEET (EXACT WORD REPLICATION) -->
+                <div class="official-paper" id="print-area">
+                    <div class="top-single-quote">'</div>
+                    
+                    <!-- Table 0: Title and Date (Exact Word tblGrid: 7 cols) -->
+                    <table class="tbl-word tbl-header">
+                        <colgroup>
+                            <col style="width: 46.64%;">
+                            <col style="width: 17.34%;">
+                            <col style="width: 5.34%;">
+                            <col style="width: 6.18%;">
+                            <col style="width: 12.48%;">
+                            <col style="width: 5.33%;">
+                            <col style="width: 6.69%;">
+                        </colgroup>
+                        <tr>
+                            <td colspan="7" class="cell-title">ใบส่งซ่อมรถยนต์เช่า</td>
+                        </tr>
+                        <tr class="row-date">
+                            <td></td>
+                            <td class="text-right whitespace-nowrap">วันที่แจ้งซ่อม</td>
+                            <td class="cell-dash text-center blue-val" id="view-day">1</td>
+                            <td class="text-center whitespace-nowrap">เดือน</td>
+                            <td class="cell-dash text-center blue-val" id="view-month">เมษายน</td>
+                            <td class="text-center whitespace-nowrap">พ.ศ.</td>
+                            <td class="cell-dash text-center blue-val" id="view-year">2569</td>
+                        </tr>
+                    </table>
+
+                    <!-- Table 1: รถส่งซ่อม -->
+                    <table class="tbl-word tbl-section">
+                        <colgroup>
+                            <col style="width: 72%;">
+                            <col style="width: 28%;">
+                        </colgroup>
+                        <tr>
+                            <td class="section-title">รถส่งซ่อม</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td class="valign-bottom">
+                                ประเภทรถยนต์ &nbsp;
+                                <span class="chk-circle" id="chk-v-เก๋ง"></span> รถเก๋ง &nbsp;
+                                <span class="chk-circle" id="chk-v-ปิคอัพ"></span> รถปิคอัพ &nbsp;
+                                <span class="chk-circle checked" id="chk-v-ตู้"></span> รถตู้ &nbsp;
+                                <span class="chk-circle" id="chk-v-บรรทุก"></span> บรรทุก
+                            </td>
+                            <td class="text-right valign-bottom">
+                                <span class="red-text font-bold">ระดับน้ำมัน</span>
+                                <div class="gauge-box" id="car-fuel-gauge"></div>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- Table 2: ข้อมูลรถส่งซ่อม (Exact Word tblGrid: 8 cols) -->
+                    <table class="tbl-word tbl-car-info">
+                        <colgroup>
+                            <col style="width: 12.11%;">
+                            <col style="width: 12.11%;">
+                            <col style="width: 12.10%;">
+                            <col style="width: 7.06%;">
+                            <col style="width: 21.56%;">
+                            <col style="width: 10.70%;">
+                            <col style="width: 0.10%;">
+                            <col style="width: 24.26%;">
+                        </colgroup>
+                        <tr>
+                            <td class="whitespace-nowrap">ยี่ห้อรถยนต์</td>
+                            <td colspan="2" class="cell-dash text-center blue-val" id="view-brand">TOYOTA</td>
+                            <td class="text-center whitespace-nowrap">รุ่นรถ</td>
+                            <td class="cell-dash text-center blue-val" id="view-model">COMMUTER</td>
+                            <td class="text-center whitespace-nowrap">ทะเบียนรถ</td>
+                            <td colspan="2" class="cell-dash text-center blue-val" id="view-license">ส.น.ว. 1816</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="whitespace-nowrap">บริษัท/ห้างร้านที่ดำเนินการ</td>
+                            <td colspan="3" class="cell-dash pl-2 blue-val" id="view-garage">ศูนย์โตโยต้าวรจักรยนต์ สาขาวิสุทธิกษัตริย์</td>
+                            <td colspan="2" class="text-center whitespace-nowrap">เลขไมล์</td>
+                            <td class="cell-dash text-center blue-val" id="view-mileage">19,838</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="whitespace-nowrap">หน่วยงานที่ส่งซ่อม</td>
+                            <td colspan="3" class="cell-dash text-center blue-val" id="view-department">โรงเรียนจิตรลดา</td>
+                            <td colspan="2" class="text-center whitespace-nowrap">เบอร์โทร</td>
+                            <td class="cell-dash text-center blue-val" id="view-phone">092-225-4529</td>
+                        </tr>
+                    </table>
+
+                    <!-- Table 3: รายการแจ้งซ่อม (Exact Word tblGrid: 4 cols) -->
+                    <table class="tbl-word tbl-repair">
+                        <colgroup>
+                            <col style="width: 6.37%;">
+                            <col style="width: 44.78%;">
+                            <col style="width: 1.35%;">
+                            <col style="width: 47.50%;">
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th class="b-solid">ลำดับ</th>
+                                <th class="b-solid">รายการแจ้งซ่อม / รายการชำรุด<br><span class="font-normal text-sm">(ระบุสาเหตุข้อชำรุด)</span></th>
+                                <th class="b-gap"></th>
+                                <th class="b-solid">รายการแจ้งซ่อมที่ดำเนินการแก้ไขแล้ว</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="row-spacer-repair">
+                                <td class="b-solid"></td>
+                                <td class="b-solid"></td>
+                                <td class="b-gap"></td>
+                                <td class="b-solid"></td>
+                            </tr>
+                            <tr>
+                                <td class="b-item text-center">1.</td>
+                                <td class="b-item blue-val pl-2" id="view-item-1">เปลี่ยนน้ำมันเครื่อง</td>
+                                <td class="b-gap"></td>
+                                <td class="b-item"></td>
+                            </tr>
+                            <tr>
+                                <td class="b-item text-center">2.</td>
+                                <td class="b-item blue-val pl-2" id="view-item-2">เปลี่ยนกรองน้ำมันเครื่อง</td>
+                                <td class="b-gap"></td>
+                                <td class="b-item"></td>
+                            </tr>
+                            <tr>
+                                <td class="b-item text-center">3.</td>
+                                <td class="b-item blue-val pl-2" id="view-item-3">สลับยาง จำนวน 4 เส้น</td>
+                                <td class="b-gap"></td>
+                                <td class="b-item"></td>
+                            </tr>
+                            <tr>
+                                <td class="b-item text-center">4.</td>
+                                <td class="b-item blue-val pl-2" id="view-item-4"></td>
+                                <td class="b-gap"></td>
+                                <td class="b-item"></td>
+                            </tr>
+                            <tr>
+                                <td class="b-item-last text-center">5.</td>
+                                <td class="b-item-last blue-val pl-2" id="view-item-5"></td>
+                                <td class="b-gap"></td>
+                                <td class="b-item-last"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Table 4: รถทดแทน -->
+                    <table class="tbl-word tbl-section mt-section">
+                        <colgroup>
+                            <col style="width: 72%;">
+                            <col style="width: 28%;">
+                        </colgroup>
+                        <tr>
+                            <td class="section-title">รถทดแทน</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td class="valign-bottom">
+                                ประเภทรถยนต์ &nbsp;
+                                <span class="chk-circle" id="chk-rep-เก๋ง"></span> รถเก๋ง &nbsp;
+                                <span class="chk-circle" id="chk-rep-ปิคอัพ"></span> รถปิคอัพ &nbsp;
+                                <span class="chk-circle" id="chk-rep-ตู้"></span> รถตู้ &nbsp;
+                                <span class="chk-circle" id="chk-rep-บรรทุก"></span> บรรทุก
+                            </td>
+                            <td class="text-right valign-bottom">
+                                <span class="red-text font-bold">ระดับน้ำมัน</span>
+                                <div class="gauge-box" id="rep-fuel-gauge"></div>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- Table 5: ข้อมูลรถทดแทน, หมายเหตุ, ส่วนลงนาม (Exact Word tblGrid: 12 cols) -->
+                    <table class="tbl-word tbl-rep-and-sign">
+                        <colgroup>
+                            <col style="width: 6.41%;">
+                            <col style="width: 4.17%;">
+                            <col style="width: 0.96%;">
+                            <col style="width: 11.54%;">
+                            <col style="width: 9.23%;">
+                            <col style="width: 2.31%;">
+                            <col style="width: 6.41%;">
+                            <col style="width: 17.96%;">
+                            <col style="width: 1.28%;">
+                            <col style="width: 8.98%;">
+                            <col style="width: 4.84%;">
+                            <col style="width: 25.91%;">
+                        </colgroup>
+                        <tr>
+                            <td colspan="3" class="whitespace-nowrap">ยี่ห้อรถยนต์</td>
+                            <td colspan="3" class="cell-dash text-center blue-val" id="view-rep-brand"></td>
+                            <td class="text-center whitespace-nowrap">รุ่นรถ</td>
+                            <td colspan="2" class="cell-dash text-center blue-val" id="view-rep-model"></td>
+                            <td colspan="2" class="text-center whitespace-nowrap">ทะเบียนรถ</td>
+                            <td class="cell-dot text-center blue-val" id="view-rep-license"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" class="whitespace-nowrap">บริษัท/ห้างร้านที่ดำเนินการ</td>
+                            <td colspan="4" class="cell-dash pl-2 blue-val" id="view-rep-garage"></td>
+                            <td></td>
+                            <td colspan="2" class="text-center whitespace-nowrap">เลขไมล์</td>
+                            <td class="cell-dash text-center blue-val" id="view-rep-mileage"></td>
+                        </tr>
+                        <tr class="row-space-line">
+                            <td colspan="12"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="font-bold whitespace-nowrap">หมายเหตุ</td>
+                            <td colspan="10" class="cell-dash pl-2 blue-val" id="view-note1"></td>
+                        </tr>
+                        <tr class="row-space-line">
+                            <td colspan="12"></td>
+                        </tr>
+                        <!-- Signature Line 1 -->
+                        <tr class="row-sig">
+                            <td class="whitespace-nowrap">ลงชื่อ</td>
+                            <td colspan="4" class="cell-dash text-center blue-val" id="view-sender-name">นายนันทกา  เสาวรส</td>
+                            <td colspan="5" class="whitespace-nowrap pl-2">จนท.นำรถเข้าซ่อม &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="red-text font-bold">วันที่ส่งรถเข้าซ่อม</span></td>
+                            <td colspan="2" class="cell-dash text-center blue-val" id="view-send-date">10 เมษายน 2569</td>
+                        </tr>
+                        <!-- Signature Line 2 -->
+                        <tr class="row-sig">
+                            <td class="whitespace-nowrap">ลงชื่อ</td>
+                            <td colspan="4" class="cell-dash text-center"></td>
+                            <td colspan="5" class="whitespace-nowrap pl-2">จนท.บริษัทที่เข้าซ่อม &nbsp;&nbsp;&nbsp;<span class="red-text font-bold">วันที่รับรถ</span></td>
+                            <td colspan="2" class="cell-dash text-center"></td>
+                        </tr>
+                        <tr class="row-space-line">
+                            <td colspan="12"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="font-bold whitespace-nowrap">หมายเหตุ</td>
+                            <td colspan="10" class="cell-dash pl-2 blue-val" id="view-note2"></td>
+                        </tr>
+                    </table>
+
+                    <!-- Bottom Row: Coordinator Box (Left) + Approver Block (Right) side-by-side like Master -->
+                    <div class="bottom-sign-row">
+                        <div class="coord-box">
+                            <div>ผู้ประสานงาน : นายพัฐวิศ  บุญเกิด</div>
+                            <div>โทร. 02-356-0879 หรือ 090-994-5915</div>
+                        </div>
+
+                        <div class="approver-wrap">
+                            <div class="appr-ack">ทราบ</div>
+                            <table class="tbl-approver">
+                                <tr>
+                                    <td class="cell-dash-tb text-center whitespace-nowrap">( &nbsp;&nbsp;&nbsp;&nbsp;<span class="blue-val">นายสัญญา  คำพันธ์</span>&nbsp;&nbsp;&nbsp;&nbsp; )</td>
+                                </tr>
+                                <tr>
+                                    <td class="cell-dash text-center whitespace-nowrap blue-val">รองผู้อำนวยการกองรถยนต์หลวง (1)</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- PAGE 2+: ATTACHED PHOTOS (Dynamic Legal Pages) -->
+                <div id="photo-pages-container"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 🗄️ REPAIR DATABASE MODAL (SQLite History Dashboard) -->
+    <div id="db-modal" class="db-modal hidden no-print" onclick="if(event.target===this) closeDbModal()">
+        <div class="db-modal-dialog">
+            <div class="db-modal-header">
+                <div>
+                    <h2>🗄️ ฐานข้อมูลประวัติการส่งซ่อมรถยนต์เช่า</h2>
+                    <p>จัดเก็บถาวรในไฟล์ <code>car_service.db</code> (SQLite) — ค้นหา กรองรายคัน อัปเดตสถานะ และส่งออก Excel ได้ทันที</p>
+                </div>
+                <button type="button" class="db-close-btn" onclick="closeDbModal()">✕ ปิด</button>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="db-stats-row">
+                <div class="db-stat-card">
+                    <span class="stat-label">ส่งซ่อมทั้งหมด</span>
+                    <strong id="stat-total" class="stat-num">0</strong>
+                </div>
+                <div class="db-stat-card stat-pending">
+                    <span class="stat-label">🔧 กำลังซ่อม / รอส่ง</span>
+                    <strong id="stat-active" class="stat-num">0</strong>
+                </div>
+                <div class="db-stat-card stat-done">
+                    <span class="stat-label">✅ รับรถคืนแล้ว</span>
+                    <strong id="stat-done" class="stat-num">0</strong>
+                </div>
+            </div>
+
+            <!-- Filter Bar -->
+            <div class="db-filter-bar">
+                <select id="db-filter-license" onchange="renderDbTable()">
+                    <option value="">ทะเบียนรถ: ทั้งหมด</option>
+                    <option value="ส.น.ว. 1816">ส.น.ว. 1816</option>
+                    <option value="ส.น.ว. 1817">ส.น.ว. 1817</option>
+                    <option value="ส.น.ว. 1818">ส.น.ว. 1818</option>
+                    <option value="ส.น.ว. 1819">ส.น.ว. 1819</option>
+                    <option value="ส.น.ว. 1820">ส.น.ว. 1820</option>
+                </select>
+                <select id="db-filter-status" onchange="renderDbTable()">
+                    <option value="">สถานะ: ทั้งหมด</option>
+                    <option value="รอส่งซ่อม">🟡 รอส่งซ่อม</option>
+                    <option value="กำลังซ่อม">🔧 กำลังซ่อม</option>
+                    <option value="รับรถแล้ว">✅ รับรถแล้ว</option>
+                </select>
+                <input type="text" id="db-search-input" placeholder="🔍 ค้นหารายการซ่อม, ศูนย์บริการ, ชื่อ จนท..." oninput="renderDbTable()">
+                <button type="button" class="btn-export-excel" onclick="exportExcelCsv()">📊 ส่งออก Excel (.csv)</button>
+            </div>
+
+            <!-- Table -->
+            <div class="db-table-wrap">
+                <table class="db-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 11%;">วันที่แจ้งซ่อม</th>
+                            <th style="width: 11%;">ทะเบียนรถ</th>
+                            <th style="width: 9%;">เลขไมล์</th>
+                            <th style="width: 17%;">ศูนย์บริการ / อู่</th>
+                            <th style="width: 22%;">รายการแจ้งซ่อม</th>
+                            <th style="width: 11%;">จนท.นำส่ง</th>
+                            <th style="width: 11%;">สถานะ</th>
+                            <th style="width: 8%;">จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="db-table-body">
+                        <tr><td colspan="8" style="text-align:center; padding: 2rem; color:#64748b;">ยังไม่มีข้อมูลในฐานข้อมูล</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

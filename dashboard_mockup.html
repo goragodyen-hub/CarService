@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mockup — CarService Dashboard (โรงเรียนจิตรลดา)</title>
+  <link rel="icon" type="image/png" href="icon.png" />
+  <style>
+    @font-face {
+      font-family: 'Sarabun';
+      font-weight: 400;
+      src: url('fonts/Sarabun-Regular.ttf') format('truetype');
+    }
+    @font-face {
+      font-family: 'Sarabun';
+      font-weight: 600;
+      src: url('fonts/Sarabun-SemiBold.ttf') format('truetype');
+    }
+    @font-face {
+      font-family: 'Sarabun';
+      font-weight: 700;
+      src: url('fonts/Sarabun-Bold.ttf') format('truetype');
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f1f5f9;
+      color: #0f172a;
+      padding: 24px;
+      line-height: 1.5;
+    }
+
+    .container { max-width: 1240px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+
+    /* Header */
+    .topbar {
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;
+      background: #0f172a; color: #fff; padding: 18px 24px; border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(15,23,42,0.12);
+    }
+    .badge {
+      display: inline-block; padding: 2px 8px; border-radius: 6px;
+      background: #2563eb; color: #fff; font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+    }
+    .sub-tag { font-size: 12px; color: #94a3b8; margin-left: 8px; }
+    .topbar h1 { font-size: 20px; margin-top: 4px; }
+    .topbar p { font-size: 13px; color: #cbd5e1; }
+    .top-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    .btn {
+      padding: 8px 14px; border-radius: 8px; font-family: inherit; font-size: 13px; font-weight: 600;
+      border: 1px solid transparent; cursor: pointer; transition: all 0.15s;
+    }
+    .btn-ghost { background: #1e293b; color: #e2e8f0; border-color: #334155; }
+    .btn-ghost:hover { background: #334155; }
+    .btn-green { background: #16a34a; color: #fff; }
+    .btn-green:hover { background: #15803d; }
+    .btn-blue { background: #2563eb; color: #fff; }
+    .btn-blue:hover { background: #1d4ed8; }
+
+    /* KPI Row */
+    .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .kpi-card {
+      background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03); border-top: 4px solid #2563eb;
+    }
+    .kpi-card.amber { border-top-color: #f59e0b; }
+    .kpi-card.green { border-top-color: #10b981; }
+    .kpi-card.indigo { border-top-color: #6366f1; }
+    .kpi-label { font-size: 13px; color: #64748b; font-weight: 600; }
+    .kpi-val { font-size: 28px; font-weight: 700; margin: 4px 0 2px 0; color: #0f172a; }
+    .kpi-card.amber .kpi-val { color: #d97706; }
+    .kpi-card.green .kpi-val { color: #059669; }
+    .kpi-card.indigo .kpi-val { color: #1e40af; }
+    .kpi-sub { font-size: 12px; color: #64748b; }
+
+    /* Fleet Cards */
+    .section-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .section-head h2 { font-size: 15px; font-weight: 700; color: #1e293b; }
+    .reset-link { background: none; border: none; color: #2563eb; font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: underline; }
+    .hidden { display: none !important; }
+
+    .fleet-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+    .fleet-card {
+      text-align: left; background: #fff; border: 1.5px solid #e2e8f0; border-radius: 12px;
+      padding: 14px; cursor: pointer; font-family: inherit; transition: all 0.15s;
+    }
+    .fleet-card:hover { border-color: #3b82f6; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(37,99,235,0.1); }
+    .fleet-card.selected { border-color: #2563eb; background: #eff6ff; box-shadow: 0 0 0 3px rgba(37,99,235,0.18); }
+    .fleet-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .fleet-plate { font-size: 15px; font-weight: 700; color: #0f172a; }
+    .pill { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 99px; }
+    .pill-ok { background: #dcfce7; color: #166534; }
+    .pill-busy { background: #fef3c7; color: #92400e; }
+    .fleet-meta { font-size: 12.5px; color: #475569; line-height: 1.5; }
+    .fleet-meta strong { color: #0f172a; }
+
+    /* Charts Row */
+    .charts-grid { display: grid; grid-template-columns: 7fr 5fr; gap: 16px; }
+    .card {
+      background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+    .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .card-head h3 { font-size: 15px; font-weight: 700; }
+    .card-head span { font-size: 12px; color: #64748b; }
+
+    .bar-list { display: flex; flex-direction: column; gap: 12px; }
+    .bar-row { display: flex; align-items: center; gap: 12px; font-size: 13px; cursor: pointer; }
+    .bar-label { width: 88px; font-weight: 700; color: #1e293b; flex-shrink: 0; }
+    .bar-track { flex: 1; height: 22px; background: #f1f5f9; border-radius: 6px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 6px; transition: width 0.3s ease; }
+    .bar-val { width: 52px; text-align: right; font-weight: 700; color: #0f172a; }
+
+    .top-list { display: flex; flex-direction: column; }
+    .top-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 13px;
+    }
+    .top-item:last-child { border-bottom: none; }
+    .top-count { background: #f1f5f9; color: #0f172a; font-weight: 700; padding: 2px 10px; border-radius: 8px; font-size: 12px; }
+
+    /* Table */
+    .table-controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .table-controls select, .table-controls input {
+      padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 7px;
+      font-family: inherit; font-size: 13px; background: #f8fafc;
+    }
+    .table-wrap { overflow-x: auto; margin-top: 12px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    th {
+      text-align: left; padding: 10px 10px; background: #f8fafc; color: #475569;
+      border-bottom: 2px solid #e2e8f0; font-weight: 700; white-space: nowrap;
+    }
+    td { padding: 10px 10px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+    tr:hover td { background: #f8fafc; }
+    .plate-col { font-weight: 700; color: #1e40af; white-space: nowrap; }
+    .photo-tag { font-size: 11px; color: #64748b; font-weight: 400; }
+
+    @media (max-width: 960px) {
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .fleet-grid { grid-template-columns: repeat(2, 1fr); }
+      .charts-grid { grid-template-columns: 1fr; }
+    }
+    @media print {
+      body { background: #fff; padding: 0; }
+      .no-print { display: none !important; }
+    }
+
+    /* From Uiverse.io by RiccardoRapelli - https://uiverse.io/RiccardoRapelli/jolly-chicken-91 */
+    /* MIT License, Copyright (c) RiccardoRapelli (Riccardo Rapelli) */
+    .uiverse-theme-switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+      vertical-align: middle;
+      flex-shrink: 0;
+    }
+
+    .uiverse-theme-switch #uiverse-theme-input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .uiverse-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #2196f3;
+      transition: 0.4s;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .uiverse-sun-moon {
+      position: absolute;
+      content: "";
+      height: 26px; width: 26px;
+      left: 4px; bottom: 4px;
+      background-color: yellow;
+      transition: 0.4s;
+    }
+
+    #uiverse-theme-input:checked + .uiverse-slider { background-color: black; }
+    #uiverse-theme-input:focus + .uiverse-slider { box-shadow: 0 0 1px #2196f3; }
+
+    #uiverse-theme-input:checked + .uiverse-slider .uiverse-sun-moon {
+      transform: translateX(26px);
+      background-color: white;
+      animation: uiverse-rotate-center 0.6s ease-in-out both;
+    }
+
+    @keyframes uiverse-rotate-center {
+      0% { transform: translateX(0) rotate(0deg); }
+      100% { transform: translateX(26px) rotate(360deg); }
+    }
+
+    .uiverse-moon-dot { opacity: 0; transition: 0.4s; fill: gray; }
+    #uiverse-theme-input:checked + .uiverse-slider .uiverse-sun-moon .uiverse-moon-dot { opacity: 1; }
+    .uiverse-slider.uiverse-round { border-radius: 34px; }
+    .uiverse-slider.uiverse-round .uiverse-sun-moon { border-radius: 50%; }
+
+    #uiverse-moon-dot-1 { left: 10px; top: 3px; position: absolute; width: 6px; height: 6px; z-index: 4; }
+    #uiverse-moon-dot-2 { left: 2px; top: 10px; position: absolute; width: 10px; height: 10px; z-index: 4; }
+    #uiverse-moon-dot-3 { left: 16px; top: 18px; position: absolute; width: 3px; height: 3px; z-index: 4; }
+
+    #uiverse-light-ray-1 { left: -8px; top: -8px; position: absolute; width: 43px; height: 43px; z-index: -1; fill: white; opacity: 10%; }
+    #uiverse-light-ray-2 { left: -50%; top: -50%; position: absolute; width: 55px; height: 55px; z-index: -1; fill: white; opacity: 10%; }
+    #uiverse-light-ray-3 { left: -18px; top: -18px; position: absolute; width: 60px; height: 60px; z-index: -1; fill: white; opacity: 10%; }
+
+    .uiverse-cloud-light { position: absolute; fill: #eee; animation: uiverse-cloud-move 6s infinite; }
+    .uiverse-cloud-dark { position: absolute; fill: #ccc; animation: uiverse-cloud-move 6s infinite 1s; }
+
+    #uiverse-cloud-1 { left: 30px; top: 15px; width: 40px; }
+    #uiverse-cloud-2 { left: 44px; top: 10px; width: 20px; }
+    #uiverse-cloud-3 { left: 18px; top: 24px; width: 30px; }
+    #uiverse-cloud-4 { left: 36px; top: 18px; width: 40px; }
+    #uiverse-cloud-5 { left: 48px; top: 14px; width: 20px; }
+    #uiverse-cloud-6 { left: 22px; top: 26px; width: 30px; }
+
+    @keyframes uiverse-cloud-move {
+      0% { transform: translateX(0px); }
+      40% { transform: translateX(4px); }
+      80% { transform: translateX(-4px); }
+      100% { transform: translateX(0px); }
+    }
+
+    .uiverse-stars { transform: translateY(-32px); opacity: 0; transition: 0.4s; }
+    .uiverse-star { fill: white; position: absolute; transition: 0.4s; animation: uiverse-star-twinkle 2s infinite; }
+    #uiverse-theme-input:checked + .uiverse-slider .uiverse-stars { transform: translateY(0); opacity: 1; }
+
+    #uiverse-star-1 { width: 20px; top: 2px; left: 3px; animation-delay: 0.3s; }
+    #uiverse-star-2 { width: 6px; top: 16px; left: 3px; }
+    #uiverse-star-3 { width: 12px; top: 20px; left: 10px; animation-delay: 0.6s; }
+    #uiverse-star-4 { width: 18px; top: 0px; left: 18px; animation-delay: 1.3s; }
+
+    @keyframes uiverse-star-twinkle {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.2); }
+      80% { transform: scale(0.8); }
+      100% { transform: scale(1); }
+    }
+
+    /* Dashboard Dark Mode */
+    body.dark-mode { background: #0b1120; color: #e2e8f0; }
+    body.dark-mode .topbar { background: #1e293b; border: 1px solid #334155; }
+    body.dark-mode .kpi-card,
+    body.dark-mode .fleet-card,
+    body.dark-mode .card { background: #1e293b; border-color: #334155; color: #e2e8f0; }
+    body.dark-mode .fleet-card.selected { background: #1e3a8a; border-color: #60a5fa; }
+    body.dark-mode .kpi-val,
+    body.dark-mode .fleet-plate,
+    body.dark-mode .fleet-meta strong,
+    body.dark-mode .section-head h2,
+    body.dark-mode .bar-label,
+    body.dark-mode .bar-val { color: #f8fafc; }
+    body.dark-mode .kpi-card.amber .kpi-val { color: #fbbf24; }
+    body.dark-mode .kpi-card.green .kpi-val { color: #34d399; }
+    body.dark-mode .kpi-card.indigo .kpi-val { color: #60a5fa; }
+    body.dark-mode .kpi-label,
+    body.dark-mode .kpi-sub,
+    body.dark-mode .fleet-meta,
+    body.dark-mode .card-head span,
+    body.dark-mode .photo-tag { color: #94a3b8; }
+    body.dark-mode .bar-track,
+    body.dark-mode .top-count { background: #0f172a; color: #e2e8f0; }
+    body.dark-mode .top-item { border-bottom-color: #334155; }
+    body.dark-mode .table-controls select,
+    body.dark-mode .table-controls input { background: #0f172a; border-color: #475569; color: #f8fafc; }
+    body.dark-mode th { background: #0f172a; color: #cbd5e1; border-bottom-color: #334155; }
+    body.dark-mode td { border-bottom-color: #334155; }
+    body.dark-mode tr:hover td { background: #0f172a; }
+    body.dark-mode .plate-col { color: #60a5fa; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Top Header -->
+    <div class="topbar">
+      <div>
+        <div>
+          <span class="badge">MOCKUP</span>
+          <span class="sub-tag">Offline SQLite • car_service.db</span>
+        </div>
+        <h1>📊 CarService Dashboard — ระบบติดตามการซ่อมบำรุงรถยนต์เช่า</h1>
+        <p>หน่วยงาน: โรงเรียนจิตรลดา • รถตู้ TOYOTA COMMUTER (ส.น.ว. 1816 – 1820)</p>
+      </div>
+      <div class="top-actions no-print" style="align-items: center;">
+        <button class="btn btn-ghost" onclick="alert('ในโปรแกรมจริง ปุ่มนี้จะเปิดหน้าต่างให้เลือกไฟล์ car_service.db จากแฟลชไดรฟ์หรือโฟลเดอร์ใดก็ได้ครับ')">📂 เปิดไฟล์ car_service.db</button>
+        <button class="btn btn-green" onclick="alert('ส่งออกตารางทั้งหมดเป็นไฟล์ Excel (.csv) ภาษาไทยพร้อมทำรายงาน')">📊 ส่งออก Excel (.csv)</button>
+        <button class="btn btn-blue" onclick="window.print()">🖨️ พิมพ์รายงานสรุป</button>
+        <!-- From Uiverse.io by RiccardoRapelli - https://uiverse.io/RiccardoRapelli/jolly-chicken-91 -->
+        <!-- MIT License, Copyright (c) RiccardoRapelli (Riccardo Rapelli) -->
+        <label class="uiverse-theme-switch" title="สลับโหมดกลางวัน / กลางคืน">
+          <input id="uiverse-theme-input" type="checkbox" onchange="toggleDarkMode(this.checked)" />
+          <div class="uiverse-slider uiverse-round">
+            <div class="uiverse-sun-moon">
+              <svg id="uiverse-moon-dot-1" class="uiverse-moon-dot" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50"></circle></svg>
+              <svg id="uiverse-moon-dot-2" class="uiverse-moon-dot" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50"></circle></svg>
+              <svg id="uiverse-moon-dot-3" class="uiverse-moon-dot" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50"></circle></svg>
+              <svg id="uiverse-light-ray-1" class="uiverse-light-ray" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50"></circle></svg>
+              <svg id="uiverse-light-ray-2" class="uiverse-light-ray" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50"></circle></svg>
+              <svg id="uiverse-light-ray-3" class="uiverse-light-ray" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50"></circle></svg>
+              <svg id="uiverse-cloud-1" class="uiverse-cloud-dark" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50"></circle></svg>
+              <svg id="uiverse-cloud-2" class="uiverse-cloud-dark" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50"></circle></svg>
+              <svg id="uiverse-cloud-3" class="uiverse-cloud-dark" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50"></circle></svg>
+              <svg id="uiverse-cloud-4" class="uiverse-cloud-light" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50"></circle></svg>
+              <svg id="uiverse-cloud-5" class="uiverse-cloud-light" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50"></circle></svg>
+              <svg id="uiverse-cloud-6" class="uiverse-cloud-light" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50"></circle></svg>
+            </div>
+            <div class="uiverse-stars">
+              <svg id="uiverse-star-1" class="uiverse-star" viewBox="0 0 20 20"><path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"></path></svg>
+              <svg id="uiverse-star-2" class="uiverse-star" viewBox="0 0 20 20"><path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"></path></svg>
+              <svg id="uiverse-star-3" class="uiverse-star" viewBox="0 0 20 20"><path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"></path></svg>
+              <svg id="uiverse-star-4" class="uiverse-star" viewBox="0 0 20 20"><path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"></path></svg>
+            </div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">ส่งซ่อมทั้งหมด</div>
+        <div id="kpi-total" class="kpi-val">0 ครั้ง</div>
+        <div id="kpi-total-sub" class="kpi-sub">ยังไม่มีประวัติ</div>
+      </div>
+      <div class="kpi-card amber">
+        <div class="kpi-label">🔧 กำลังซ่อมที่ศูนย์</div>
+        <div id="kpi-active" class="kpi-val">0 คัน</div>
+        <div id="kpi-active-sub" class="kpi-sub">-</div>
+      </div>
+      <div class="kpi-card green">
+        <div class="kpi-label">✅ รับรถคืนแล้ว</div>
+        <div id="kpi-done" class="kpi-val">0 ครั้ง</div>
+        <div id="kpi-done-sub" class="kpi-sub">-</div>
+      </div>
+      <div class="kpi-card indigo">
+        <div class="kpi-label">🏆 คันที่เข้าศูนย์บ่อยที่สุด</div>
+        <div id="kpi-top-car" class="kpi-val">-</div>
+        <div id="kpi-top-sub" class="kpi-sub">ยังไม่มีข้อมูล</div>
+      </div>
+    </div>
+
+    <!-- Fleet Status Cards -->
+    <div>
+      <div class="section-head">
+        <h2>🚐 สถานะรถรายคัน (คลิกที่การ์ดเพื่อกรองดูประวัติเฉพาะคันนั้น)</h2>
+        <button id="btn-reset-car" class="reset-link hidden" onclick="selectCar('')">แสดงทุกคัน</button>
+      </div>
+      <div id="fleet-cards" class="fleet-grid"></div>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-grid">
+      <div class="card">
+        <div class="card-head">
+          <h3>📈 จำนวนครั้งที่ส่งซ่อมแยกตามทะเบียนรถ</h3>
+          <span>คลิกที่แท่งกราฟเพื่อกรองได้</span>
+        </div>
+        <div id="bar-chart" class="bar-list"></div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <h3>🔧 รายการซ่อมบำรุงที่พบบ่อย</h3>
+          <span>Top 5</span>
+        </div>
+        <div id="top-items" class="top-list"></div>
+      </div>
+    </div>
+
+    <!-- Detailed History Table -->
+    <div class="card">
+      <div class="card-head" style="flex-wrap: wrap; gap: 10px;">
+        <h3>📋 ตารางประวัติการส่งซ่อมทั้งหมด</h3>
+        <div class="table-controls no-print">
+          <select id="f-license" onchange="renderTable()">
+            <option value="">ทะเบียน: ทั้งหมด</option>
+            <option value="ส.น.ว. 1816">ส.น.ว. 1816</option>
+            <option value="ส.น.ว. 1817">ส.น.ว. 1817</option>
+            <option value="ส.น.ว. 1818">ส.น.ว. 1818</option>
+            <option value="ส.น.ว. 1819">ส.น.ว. 1819</option>
+            <option value="ส.น.ว. 1820">ส.น.ว. 1820</option>
+          </select>
+          <select id="f-status" onchange="renderTable()">
+            <option value="">สถานะ: ทั้งหมด</option>
+            <option value="กำลังซ่อม">🔧 กำลังซ่อม</option>
+            <option value="รับรถแล้ว">✅ รับรถแล้ว</option>
+          </select>
+          <input id="f-search" type="text" oninput="renderTable()" placeholder="🔍 ค้นหารายการ / ศูนย์บริการ..." />
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>วันที่แจ้งซ่อม</th>
+              <th>ทะเบียนรถ</th>
+              <th>เลขไมล์</th>
+              <th>ศูนย์บริการ</th>
+              <th>รายการแจ้งซ่อม</th>
+              <th>จนท.นำส่ง</th>
+              <th>สถานะ</th>
+            </tr>
+          </thead>
+          <tbody id="tbl-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const RECORDS = [];
+
+    const CARS = ['ส.น.ว. 1816', 'ส.น.ว. 1817', 'ส.น.ว. 1818', 'ส.น.ว. 1819', 'ส.น.ว. 1820'];
+    const CAR_DRIVERS = {
+      'ส.น.ว. 1816': 'นันทกา เสาวรส (1–15) / จินฑาทิพทย์ สว่างเมฆ (16–31)',
+      'ส.น.ว. 1817': 'สุรินทร์ เพชรแท้',
+      'ส.น.ว. 1818': 'แกม โสนาพูน',
+      'ส.น.ว. 1819': 'จุมพล ดุษฎีพฤฒิพันธุ์',
+      'ส.น.ว. 1820': 'อดิเรก จันทร์โฮ้วมณี'
+    };
+    const BAR_COLORS = ['#2563eb', '#0ea5e9', '#f59e0b', '#10b981', '#8b5cf6'];
+    let selectedCar = '';
+
+    function renderKpis() {
+      const total = RECORDS.length;
+      const activeList = RECORDS.filter(r => r.status === 'กำลังซ่อม');
+      const done = RECORDS.filter(r => r.status === 'รับรถแล้ว').length;
+      document.getElementById('kpi-total').textContent = `${total} ครั้ง`;
+      document.getElementById('kpi-total-sub').textContent = total ? `จากทั้งหมด ${CARS.length} คัน` : 'ยังไม่มีประวัติ';
+      document.getElementById('kpi-active').textContent = `${activeList.length} คัน`;
+      document.getElementById('kpi-active-sub').textContent = activeList.length ? activeList.map(r => r.license).join(', ') : '-';
+      document.getElementById('kpi-done').textContent = `${done} ครั้ง`;
+      document.getElementById('kpi-done-sub').textContent = total ? `ปิดงานแล้ว ${((done / total) * 100).toFixed(1)}%` : '-';
+
+      const counts = CARS.map(lic => ({ lic, n: RECORDS.filter(r => r.license === lic).length })).sort((a, b) => b.n - a.n);
+      if (counts[0] && counts[0].n > 0) {
+        document.getElementById('kpi-top-car').textContent = counts[0].lic;
+        document.getElementById('kpi-top-sub').textContent = `เข้าซ่อม ${counts[0].n} ครั้ง`;
+      } else {
+        document.getElementById('kpi-top-car').textContent = '-';
+        document.getElementById('kpi-top-sub').textContent = 'ยังไม่มีข้อมูล';
+      }
+    }
+
+    function selectCar(lic) {
+      selectedCar = (selectedCar === lic) ? '' : lic;
+      document.getElementById('f-license').value = selectedCar;
+      document.getElementById('btn-reset-car').classList.toggle('hidden', !selectedCar);
+      renderFleet();
+      renderTable();
+    }
+
+    function renderFleet() {
+      document.getElementById('fleet-cards').innerHTML = CARS.map(lic => {
+        const list = RECORDS.filter(r => r.license === lic);
+        const latest = list[0];
+        const inShop = latest && latest.status === 'กำลังซ่อม';
+        return `
+          <button class="fleet-card ${selectedCar === lic ? 'selected' : ''}" onclick="selectCar('${lic}')">
+            <div class="fleet-top">
+              <span class="fleet-plate">${lic}</span>
+              <span class="pill ${inShop ? 'pill-busy' : 'pill-ok'}">${inShop ? '🔧 อยู่ศูนย์' : '✅ พร้อมใช้'}</span>
+            </div>
+            <div class="fleet-meta">
+              <div style="margin-bottom:4px;">👤 <strong>${CAR_DRIVERS[lic] || '-'}</strong></div>
+              <div>ไมล์ล่าสุด: <strong>${latest ? latest.mileage : '-'} กม.</strong></div>
+              <div>เข้าซ่อมแล้ว: <strong>${list.length} ครั้ง</strong></div>
+              <div>ล่าสุด: ${latest ? latest.date : '-'}</div>
+            </div>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function renderCharts() {
+      const counts = CARS.map(lic => ({ lic, n: RECORDS.filter(r => r.license === lic).length }));
+      const maxN = Math.max(...counts.map(c => c.n), 1);
+      document.getElementById('bar-chart').innerHTML = counts.map((c, i) => `
+        <div class="bar-row" onclick="selectCar('${c.lic}')">
+          <span class="bar-label">${c.lic}</span>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:${(c.n / maxN) * 100}%; background:${BAR_COLORS[i]};"></div>
+          </div>
+          <span class="bar-val">${c.n} ครั้ง</span>
+        </div>
+      `).join('');
+
+      const tagCounts = {};
+      RECORDS.forEach(r => r.items.forEach(it => {
+        const key = it.includes('น้ำมันเครื่อง') && !it.includes('กรอง') ? 'เปลี่ยนน้ำมันเครื่อง'
+          : it.includes('กรองน้ำมัน') ? 'เปลี่ยนกรองน้ำมันเครื่อง'
+          : it.includes('สลับยาง') ? 'สลับยาง 4 เส้น'
+          : it.includes('เช็กระยะ') ? 'เช็กระยะตามกำหนด'
+          : 'ซ่อมบำรุงเฉพาะจุด (แอร์/เบรก/ไฟ)';
+        tagCounts[key] = (tagCounts[key] || 0) + 1;
+      }));
+      const top = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]);
+      document.getElementById('top-items').innerHTML = top.length ? top.map(([k, v], i) => `
+        <div class="top-item">
+          <span>${i + 1}. ${k}</span>
+          <span class="top-count">${v} ครั้ง</span>
+        </div>
+      `).join('') : '<div style="text-align:center; padding:24px; color:#64748b; font-size:13px;">ยังไม่มีข้อมูลรายการซ่อม</div>';
+    }
+
+    function renderTable() {
+      const lic = document.getElementById('f-license').value;
+      const st = document.getElementById('f-status').value;
+      const q = document.getElementById('f-search').value.trim().toLowerCase();
+
+      const rows = RECORDS.filter(r => {
+        if (lic && r.license !== lic) return false;
+        if (st && r.status !== st) return false;
+        if (q && ![r.license, r.garage, r.sender, ...r.items].join(' ').toLowerCase().includes(q)) return false;
+        return true;
+      });
+
+      document.getElementById('tbl-body').innerHTML = rows.map(r => `
+        <tr>
+          <td style="white-space:nowrap; font-weight:600;">${r.date}</td>
+          <td class="plate-col">${r.license}<div class="photo-tag">📸 ${r.photos} รูป</div></td>
+          <td style="white-space:nowrap;">${r.mileage}</td>
+          <td>${r.garage}</td>
+          <td>${r.items.map((x, i) => `${i + 1}. ${x}`).join('<br>')}</td>
+          <td style="white-space:nowrap;">${r.sender}</td>
+          <td style="white-space:nowrap;">
+            <span class="pill ${r.status === 'กำลังซ่อม' ? 'pill-busy' : 'pill-ok'}">${r.status === 'กำลังซ่อม' ? '🔧 กำลังซ่อม' : '✅ รับรถแล้ว'}</span>
+          </td>
+        </tr>
+      `).join('') || '<tr><td colspan="7" style="text-align:center; padding:24px; color:#64748b;">ไม่พบข้อมูลที่ตรงกับเงื่อนไข</td></tr>';
+    }
+
+    function toggleDarkMode(isDark, persist = true) {
+      document.body.classList.toggle('dark-mode', !!isDark);
+      const inp = document.getElementById('uiverse-theme-input');
+      if (inp) inp.checked = !!isDark;
+      if (persist) localStorage.setItem('dashboard_dark_mode', isDark ? '1' : '0');
+    }
+
+    toggleDarkMode(localStorage.getItem('dashboard_dark_mode') === '1', false);
+    renderKpis();
+    renderFleet();
+    renderCharts();
+    renderTable();
+  </script>
+</body>
+</html>

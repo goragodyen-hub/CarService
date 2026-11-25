@@ -1,0 +1,22 @@
+# ฐานข้อมูลและข้อมูลการใช้งานจริง (ไม่ควรอัปโหลดขึ้น Git)
+car_service.db
+history.json
+saved_photos/
+
+# ไฟล์เอกสาร Word ที่สร้างจากการใช้งาน/ทดสอบ (เก็บไว้เฉพาะ master_template.docx)
+*.docx
+!master_template.docx
+temp_word_gen/
+
+# ไฟล์ Build จาก PyInstaller และ Python cache
+build/
+dist/
+__pycache__/
+*.pyc
+*.pyo
+*.spec
+
+# ไฟล์อื่นๆ นอกโปรเจกต์
+แบบฝึกหัด_ไม่มีเฉลย.html
+.DS_Store
+Thumbs.db
