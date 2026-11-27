@@ -641,8 +641,8 @@
       box-shadow: 2px 2px 5px rgba(18, 34, 48, 0.16), inset 1px 1px 1px rgba(255, 255, 255, 0.5);
     }
     .pill-ok { background: linear-gradient(145deg, #bce7d3, #92d4b5); color: #0f4c34; }
-    .pill-busy { background: linear-gradient(145deg, #fde3a7, #f5c969); color: #704207; }
-    .pill-wait { background: linear-gradient(145deg, #d7e3eb, #b9cad6); color: #2b4154; }
+    .pill-busy { background: linear-gradient(145deg, #fcc89b, #efa264); color: #6e2f05; }
+    .pill-wait { background: linear-gradient(145deg, #fef0a8, #f5da6b); color: #664c03; }
     .fleet-meta { font-size: 12px; color: #364c5e; line-height: 1.55; }
     .fleet-meta strong { color: #11212f; }
 
@@ -701,6 +701,36 @@
       box-shadow: 2px 3px 6px rgba(120, 24, 24, 0.22), inset 1px 1px 1px rgba(255, 255, 255, 0.45);
     }
     .btn-red:hover { filter: brightness(1.06); }
+
+    .status-cell-wrap {
+      display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    }
+    .status-select.is-dirty {
+      box-shadow: 0 0 0 2.5px #489ca2, var(--clay-shadow-sm);
+    }
+    .btn-save-status {
+      border: none; border-radius: 999px; padding: 5px 12px;
+      background: var(--accent-teal); color: #ffffff;
+      font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer;
+      box-shadow: 3px 4px 10px rgba(18, 46, 52, 0.34), inset 1px 1px 1.5px rgba(255, 255, 255, 0.45);
+      transition: transform 0.14s ease, filter 0.14s ease;
+    }
+    .btn-save-status:hover { transform: translateY(-1px); filter: brightness(1.08); }
+    .receive-date-sub { font-size: 11px; opacity: 0.78; margin-top: 3px; }
+
+    /* Toast Notification */
+    .toast-banner {
+      position: fixed; right: 24px; bottom: 24px; z-index: 9500;
+      background: linear-gradient(145deg, #2b455d, #1b2f42);
+      color: #f0f9fc; padding: 12px 20px; border-radius: 999px;
+      font-size: 13.5px; font-weight: 700;
+      box-shadow: 0 14px 32px rgba(8, 18, 28, 0.48), inset 1.5px 1.5px 2px rgba(140, 214, 219, 0.35);
+      border: 1.5px solid rgba(100, 180, 185, 0.55);
+      display: flex; align-items: center; gap: 8px;
+      opacity: 0; transform: translateY(14px); pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+    .toast-banner.show { opacity: 1; transform: translateY(0); }
 
     /* =========================================================================
        MODALS (PHOTO VIEWER & CHANGE PASSWORD)
@@ -1345,15 +1375,22 @@
       const activeList = RECORDS.filter(r => (r.status || 'กำลังซ่อม') !== 'รับรถแล้ว');
       const done = RECORDS.filter(r => r.status === 'รับรถแล้ว').length;
 
-      // Count cars currently in shop
+      // Count cars currently in shop vs waiting to send
       const inShopCars = CARS.filter(lic => {
         const latest = RECORDS.find(r => r.license === lic);
-        return latest && (latest.status || 'กำลังซ่อม') !== 'รับรถแล้ว';
+        return latest && (latest.status || 'กำลังซ่อม') === 'กำลังซ่อม';
+      });
+      const waitingCars = CARS.filter(lic => {
+        const latest = RECORDS.find(r => r.license === lic);
+        return latest && latest.status === 'รอส่งซ่อม';
       });
       const readyCount = CARS.length - inShopCars.length;
       document.getElementById('hero-ready-text').textContent = `พร้อมใช้ ${readyCount} / ${CARS.length} คัน`;
-      document.getElementById('hero-sub-text').textContent = inShopCars.length
-        ? `อยู่ศูนย์: ${inShopCars.join(', ')}`
+      const heroParts = [];
+      if (inShopCars.length) heroParts.push(`กำลังซ่อม: ${inShopCars.join(', ')}`);
+      if (waitingCars.length) heroParts.push(`รอส่งซ่อม: ${waitingCars.join(', ')}`);
+      document.getElementById('hero-sub-text').textContent = heroParts.length
+        ? heroParts.join(' • ')
         : 'รถตู้เช่าทุกคันพร้อมปฏิบัติงาน';
 
       document.getElementById('kpi-total').textContent = `${total} ครั้ง`;
@@ -1377,13 +1414,22 @@
       document.getElementById('fleet-cards').innerHTML = CARS.map(lic => {
         const list = RECORDS.filter(r => r.license === lic);
         const latest = list[0];
-        const inShop = latest && (latest.status || 'กำลังซ่อม') !== 'รับรถแล้ว';
+        const latestStatus = latest ? (latest.status || 'กำลังซ่อม') : 'รับรถแล้ว';
+        let pillCls = 'pill-ok';
+        let pillTxt = '✅ พร้อมใช้';
+        if (latestStatus === 'รอส่งซ่อม') {
+          pillCls = 'pill-wait';
+          pillTxt = '🟡 รอส่งซ่อม';
+        } else if (latestStatus === 'กำลังซ่อม') {
+          pillCls = 'pill-busy';
+          pillTxt = '🔧 กำลังซ่อม';
+        }
         const latestDate = latest && latest.day ? `${latest.day} ${latest.month} ${latest.year}` : '-';
         return `
           <button class="fleet-card ${selectedCar === lic ? 'selected' : ''}" onclick="selectCar('${lic}')">
             <div class="fleet-top">
               <span class="fleet-plate">${lic}</span>
-              <span class="pill ${inShop ? 'pill-busy' : 'pill-ok'}">${inShop ? '🔧 อยู่ศูนย์' : '✅ พร้อมใช้'}</span>
+              <span class="pill ${pillCls}">${pillTxt}</span>
             </div>
             <div class="fleet-meta">
               <div style="margin-bottom:4px;">👤 <strong>${CAR_DRIVERS[lic] || '-'}</strong></div>
@@ -1509,12 +1555,19 @@
         const photos = r.photos || [];
         const photoBtn = photos.length ? `<br><button class="btn-photo-view no-print" onclick="viewPhotos('${r.id}')">📸 ดูรูปแนบ (${photos.length})</button>` : '';
         const statusCell = isAdmin ? `
-          <select class="status-select no-print" onchange="updateStatus('${r.id}', this.value)">
-            <option value="รอส่งซ่อม" ${curSt === 'รอส่งซ่อม' ? 'selected' : ''}>🟡 รอส่งซ่อม</option>
-            <option value="กำลังซ่อม" ${curSt === 'กำลังซ่อม' ? 'selected' : ''}>🔧 กำลังซ่อม</option>
-            <option value="รับรถแล้ว" ${curSt === 'รับรถแล้ว' ? 'selected' : ''}>✅ รับรถแล้ว</option>
-          </select>
-        ` : `<span class="pill ${curSt === 'รับรถแล้ว' ? 'pill-ok' : (curSt === 'รอส่งซ่อม' ? 'pill-wait' : 'pill-busy')}">${curSt}</span>`;
+          <div class="status-cell-wrap no-print">
+            <select id="st-sel-${r.id}" class="status-select" data-orig="${curSt}" onchange="onStatusSelectChange('${r.id}')">
+              <option value="รอส่งซ่อม" ${curSt === 'รอส่งซ่อม' ? 'selected' : ''}>🟡 รอส่งซ่อม</option>
+              <option value="กำลังซ่อม" ${curSt === 'กำลังซ่อม' ? 'selected' : ''}>🔧 กำลังซ่อม</option>
+              <option value="รับรถแล้ว" ${curSt === 'รับรถแล้ว' ? 'selected' : ''}>✅ รับรถแล้ว</option>
+            </select>
+            <button id="st-btn-${r.id}" class="btn-save-status hidden" onclick="saveStatusRow('${r.id}')">💾 บันทึก</button>
+          </div>
+          ${curSt === 'รับรถแล้ว' && r.receive_date ? `<div class="receive-date-sub">รับคืน: ${r.receive_date}</div>` : ''}
+        ` : `
+          <span class="pill ${curSt === 'รับรถแล้ว' ? 'pill-ok' : (curSt === 'รอส่งซ่อม' ? 'pill-wait' : 'pill-busy')}">${curSt}</span>
+          ${curSt === 'รับรถแล้ว' && r.receive_date ? `<div class="receive-date-sub">รับคืน: ${r.receive_date}</div>` : ''}
+        `;
 
         return `
           <tr>
@@ -1531,24 +1584,60 @@
       }).join('') || `<tr><td colspan="${colSpan}" style="text-align:center; padding:26px; opacity:0.75;">ยังไม่มีข้อมูลในฐานข้อมูล</td></tr>`;
     }
 
+    let toastTimer = null;
+    function showToast(msg) {
+      let el = document.getElementById('toast-banner');
+      if (!el) {
+        el = document.createElement('div');
+        el.id = 'toast-banner';
+        el.className = 'toast-banner no-print';
+        document.body.appendChild(el);
+      }
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+    }
+
+    function onStatusSelectChange(id) {
+      const sel = document.getElementById('st-sel-' + id);
+      const btn = document.getElementById('st-btn-' + id);
+      if (!sel || !btn) return;
+      const changed = sel.value !== sel.dataset.orig;
+      sel.classList.toggle('is-dirty', changed);
+      btn.classList.toggle('hidden', !changed);
+    }
+
+    async function saveStatusRow(id) {
+      const sel = document.getElementById('st-sel-' + id);
+      if (!sel) return;
+      await updateStatus(id, sel.value);
+    }
+
     async function updateStatus(id, status) {
-      let receive_date = undefined;
+      let receive_date = '';
       if (status === 'รับรถแล้ว') {
         const now = new Date();
         receive_date = `${now.getDate()} ${THAI_MONTHS[now.getMonth()]} ${now.getFullYear() + 543}`;
       }
-      await fetch('/api/history/status', {
+      const res = await fetch('/api/history/status', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, status, receive_date })
       });
-      await refreshAll();
+      if (res.ok) {
+        await refreshAll();
+        showToast(`✅ บันทึกสถานะ "${status}" ลงฐานข้อมูลเรียบร้อยแล้ว`);
+      } else {
+        showToast('❌ บันทึกสถานะไม่สำเร็จ กรุณาลองใหม่');
+      }
     }
 
     async function deleteRec(id) {
       if (!confirm('ยืนยันการลบประวัติการส่งซ่อมรายการนี้?')) return;
       await fetch(`/api/history/${id}`, { method: 'DELETE' });
       await refreshAll();
+      showToast('🗑️ ลบประวัติการส่งซ่อมเรียบร้อยแล้ว');
     }
 
     function viewPhotos(id) {
