@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>คู่มือการใช้งาน — ระบบใบส่งซ่อมรถยนต์เช่า & Dashboard แผนกยานพาหนะ</title>
+  <link rel="icon" type="image/png" href="icon.png" />
+  <style>
+    @font-face { font-family: 'Sarabun'; font-weight: 400; src: url('fonts/Sarabun-Regular.ttf') format('truetype'); }
+    @font-face { font-family: 'Sarabun'; font-weight: 600; src: url('fonts/Sarabun-SemiBold.ttf') format('truetype'); }
+    @font-face { font-family: 'Sarabun'; font-weight: 700; src: url('fonts/Sarabun-Bold.ttf') format('truetype'); }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Sarabun', 'TH Sarabun New', sans-serif;
+      background: #e2e8f0;
+      color: #0f172a;
+      padding: 20px;
+      font-size: 13.5px;
+      line-height: 1.55;
+    }
+
+    .toolbar {
+      max-width: 210mm;
+      margin: 0 auto 16px auto;
+      background: #0f172a;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn-print {
+      background: #2563eb; color: #fff; border: none; padding: 8px 18px;
+      border-radius: 7px; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer;
+    }
+    .btn-print:hover { background: #1d4ed8; }
+
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      background: #ffffff;
+      margin: 0 auto 22px auto;
+      padding: 18mm 20mm;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+      border-radius: 4px;
+    }
+
+    /* Cover Banner */
+    .cover-banner {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+      color: #fff;
+      padding: 24px 28px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .cover-logo { width: 72px; height: 72px; border-radius: 14px; background: #fff; padding: 4px; object-fit: contain; flex-shrink: 0; }
+    .cover-banner h1 { font-size: 22px; line-height: 1.3; }
+    .cover-banner p { font-size: 13.5px; color: #cbd5e1; margin-top: 4px; }
+    .version-pill {
+      display: inline-block; margin-top: 8px; padding: 2px 10px; border-radius: 99px;
+      background: #2563eb; color: #fff; font-size: 11.5px; font-weight: 700;
+    }
+
+    h2 {
+      font-size: 17px;
+      color: #1e3a8a;
+      border-bottom: 2px solid #dbeafe;
+      padding-bottom: 5px;
+      margin: 20px 0 10px 0;
+    }
+    h3 { font-size: 15px; color: #0f172a; margin: 12px 0 6px 0; }
+    p { margin-bottom: 8px; }
+    ul, ol { margin-left: 22px; margin-bottom: 10px; }
+    li { margin-bottom: 4px; }
+
+    .box-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+    .info-card {
+      border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 12px 14px; background: #f8fafc;
+    }
+    .info-card strong { display: block; color: #1e40af; font-size: 14.5px; margin-bottom: 4px; }
+
+    .alert {
+      border-radius: 8px; padding: 10px 14px; margin: 10px 0; font-size: 13.5px;
+    }
+    .alert-warn { background: #fef3c7; border-left: 4px solid #f59e0b; color: #78350f; }
+    .alert-tip { background: #ecfdf5; border-left: 4px solid #10b981; color: #065f46; }
+    .alert-info { background: #eff6ff; border-left: 4px solid #3b82f6; color: #1e3a8a; }
+
+    table { width: 100%; border-collapse: collapse; margin: 10px 0 14px 0; font-size: 13.5px; }
+    th, td { border: 1px solid #cbd5e1; padding: 7px 10px; text-align: left; }
+    th { background: #f1f5f9; color: #1e293b; font-weight: 700; }
+
+    code {
+      background: #f1f5f9; color: #1e3a8a; padding: 1px 6px; border-radius: 4px;
+      font-family: Consolas, monospace; font-size: 13px;
+    }
+
+    .screenshot-box {
+      margin: 8px 0 10px 0;
+      text-align: center;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+    .screenshot-box img {
+      width: 100%;
+      max-height: 82mm;
+      object-fit: contain;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(15,23,42,0.08);
+    }
+    .screenshot-cap {
+      font-size: 12px;
+      color: #475569;
+      margin-top: 4px;
+      font-weight: 600;
+    }
+
+    .footer-note {
+      margin-top: 20px; padding-top: 10px; border-top: 1px dashed #cbd5e1;
+      text-align: center; font-size: 12px; color: #64748b;
+    }
+
+    @media print {
+      @page { size: A4 portrait; margin: 10mm 13mm; }
+      body { background: #fff; padding: 0; font-size: 12.5px; line-height: 1.45; }
+      h2 { margin: 12px 0 8px 0; }
+      h3 { margin: 8px 0 4px 0; }
+      li { margin-bottom: 2px; }
+      .alert { padding: 7px 12px; margin: 7px 0; }
+      th, td { padding: 5px 8px; }
+      .no-print { display: none !important; }
+      .page {
+        width: 100%; min-height: auto; margin: 0; padding: 0;
+        box-shadow: none; border-radius: 0;
+        page-break-after: always;
+        break-after: page;
+      }
+      .page:last-child { page-break-after: auto; break-after: auto; }
+      .cover-banner { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .alert, th, .info-card { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar no-print">
+    <div>📘 <strong>คู่มือการใช้งานระบบใบส่งซ่อมรถยนต์เช่า & Dashboard</strong> (ขนาด A4 พร้อมพิมพ์/เซฟ PDF)</div>
+    <button class="btn-print" onclick="window.print()">🖨️ พิมพ์ / บันทึกเป็น PDF (A4)</button>
+  </div>
+
+  <!-- ==================== หน้า 1: ภาพรวม & การติดตั้ง ==================== -->
+  <div class="page">
+    <div class="cover-banner">
+      <img src="icon.png" class="cover-logo" alt="Logo" onerror="this.style.display='none'" />
+      <div>
+        <h1>คู่มือการใช้งานระบบใบส่งซ่อมรถยนต์เช่า</h1>
+        <p>แผนกยานพาหนะ โรงเรียนจิตรลดา • มาตรฐานกองรถยนต์หลวง (กระดาษ F4: 8.5 × 13 นิ้ว)</p>
+        <span class="version-pill">Standalone Offline Edition v1.0</span>
+      </div>
+    </div>
+
+    <h2>1. ภาพรวมของระบบ (ประกอบด้วย 2 โปรแกรม)</h2>
+    <p>ระบบถูกออกแบบให้ทำงานแบบ <strong>Stand Alone (ไม่ต้องเชื่อมต่ออินเทอร์เน็ต และไม่ต้องติดตั้ง Python หรือฟอนต์เพิ่มเติม)</strong> โดยแบ่งออกเป็น 2 โปรแกรมที่ใช้งานฐานข้อมูล <code>car_service.db</code> ร่วมกัน:</p>
+
+    <div class="box-grid">
+      <div class="info-card">
+        <strong>🚐 1. CarService_RepairOrder.exe</strong>
+        ใช้สำหรับกรอกข้อมูลออกใบส่งซ่อมรถยนต์เช่า, แนบรูปภาพหน้า 2+, สั่งพิมพ์กระดาษ F4 หรือส่งออกไฟล์ Microsoft Word (<code>.docx</code>) ต้นฉบับ 100%
+      </div>
+      <div class="info-card">
+        <strong>📊 2. CarService_Dashboard.exe</strong>
+        ใช้สำหรับแผนกยานพาหนะ/ผู้บริหาร เปิดดูภาพรวมการซ่อม, สถานะรถรายคัน, กราฟสรุป, ดูรูปแนบย้อนหลัง, อัปเดตสถานะรับรถคืน และส่งออก Excel
+      </div>
+    </div>
+
+    <h2>2. วิธีการติดตั้งบนเครื่องคอมพิวเตอร์</h2>
+    <ol>
+      <li>สร้างโฟลเดอร์ใหม่ 1 โฟลเดอร์บนเครื่องปลายทาง เช่น <code>D:\CarService\</code></li>
+      <li>นำไฟล์ <code>CarService_RepairOrder.exe</code> และ <code>CarService_Dashboard.exe</code> มาวางไว้ในโฟลเดอร์เดียวกัน</li>
+      <li><em>(แนะนำ)</em> คลิกขวาที่ไฟล์ <code>.exe</code> ทั้ง 2 ตัว ➔ <strong>Send to ➔ Desktop (create shortcut)</strong> เพื่อให้เปิดใช้งานจากหน้าจอได้สะดวก</li>
+    </ol>
+
+    <div class="alert alert-info">
+      <strong>📁 ไฟล์ที่ระบบจะสร้างให้อัตโนมัติเมื่อเริ่มใช้งาน (ห้ามลบ):</strong><br/>
+      • <code>car_service.db</code> — ไฟล์ฐานข้อมูล SQLite เก็บประวัติการส่งซ่อมและรหัสผ่านทั้งหมด<br/>
+      • <code>saved_photos\</code> — โฟลเดอร์เก็บรูปภาพแนบหน้า 2 ของแต่ละใบส่งซ่อม
+    </div>
+
+    <h2>3. ตารางข้อมูลรถและพนักงานขับรถที่ตั้งค่าอัตโนมัติไว้แล้ว</h2>
+    <p>เมื่อเลือกทะเบียนรถจาก Dropdown ระบบจะกรอกชื่อเจ้าหน้าที่นำรถเข้าซ่อมให้อัตโนมัติ (สามารถพิมพ์แก้ไขเองได้หากมีการแทนเวร):</p>
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 24%;">ทะเบียนรถ</th>
+          <th style="width: 26%;">ยี่ห้อ / รุ่น</th>
+          <th>เจ้าหน้าที่ขับรถประจำคัน (Auto-Fill)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>ส.น.ว. 1816</strong></td>
+          <td>TOYOTA COMMUTER</td>
+          <td>วันที่ 1–15: <strong>นันทกา เสาวรส</strong> / วันที่ 16–31: <strong>จินฑาทิพทย์ สว่างเมฆ</strong></td>
+        </tr>
+        <tr>
+          <td><strong>ส.น.ว. 1817</strong></td>
+          <td>TOYOTA COMMUTER</td>
+          <td><strong>สุรินทร์ เพชรแท้</strong></td>
+        </tr>
+        <tr>
+          <td><strong>ส.น.ว. 1818</strong></td>
+          <td>TOYOTA COMMUTER</td>
+          <td><strong>แกม โสนาพูน</strong></td>
+        </tr>
+        <tr>
+          <td><strong>ส.น.ว. 1819</strong></td>
+          <td>TOYOTA COMMUTER</td>
+          <td><strong>จุมพล ดุษฎีพฤฒิพันธุ์</strong></td>
+        </tr>
+        <tr>
+          <td><strong>ส.น.ว. 1820</strong></td>
+          <td>TOYOTA COMMUTER</td>
+          <td><strong>อดิเรก จันทร์โฮ้วมณี</strong></td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size: 13px; color: #475569;">* หน่วยงานที่ส่งซ่อมถูกตั้งค่าเริ่มต้นไว้ที่ <strong>โรงเรียนจิตรลดา</strong> และเบอร์โทรศัพท์ <strong>092-225-4529</strong> ตลอดการใช้งาน</p>
+  </div>
+
+  <!-- ==================== หน้า 2: วิธีใช้โปรแกรมออกใบส่งซ่อม ==================== -->
+  <div class="page">
+    <h2>4. วิธีใช้งานโปรแกรมออกใบส่งซ่อม (CarService_RepairOrder.exe)</h2>
+
+    <h3>ขั้นตอนที่ 1: เปิดโปรแกรม</h3>
+    <ol>
+      <li>ดับเบิลคลิกที่ <code>CarService_RepairOrder.exe</code></li>
+      <li>จะมีหน้าต่างจอดำขึ้นมา และเบราว์เซอร์ (Chrome/Edge) จะเปิดหน้าเว็บ <code>http://localhost:8085</code> ขึ้นมาอัตโนมัติ</li>
+    </ol>
+    <div class="alert alert-warn">
+      <strong>⚠️ ข้อควรจำ:</strong> ห้ามปิดหน้าต่างจอดำในระหว่างที่กำลังใช้งานโปรแกรม (สามารถย่อลง Taskbar ไว้ได้ และค่อยกดปิดเมื่อใช้งานเสร็จแล้ว)
+    </div>
+
+    <div class="screenshot-box">
+      <img src="manual_images/step1_repair_form.png" alt="หน้าจอโปรแกรมออกใบส่งซ่อมรถยนต์เช่า" style="max-height: 68mm;" />
+      <div class="screenshot-cap">ภาพที่ 1: หน้าจอโปรแกรมออกใบส่งซ่อม (แถบกรอกข้อมูลด้านซ้าย + พรีวิวใบส่งซ่อมขนาด F4 ด้านขวา)</div>
+    </div>
+
+    <h3>ขั้นตอนที่ 2: กรอกข้อมูลใบส่งซ่อม (แถบด้านซ้าย)</h3>
+    <ul>
+      <li><strong>ปุ่มข้อมูลด่วน:</strong> กด <code>📄 ล้างเป็นแบบฟอร์มว่าง</code> เพื่อเคลียร์ข้อมูลเดิมทั้งหมด (ชื่อโรงเรียนจิตรลดาและเบอร์โทรจะยังคงอยู่ให้)</li>
+      <li><strong>ส่วนที่ 1 (ข้อมูลรถ):</strong> เลือกทะเบียนรถ <code>ส.น.ว. 1816</code>–<code>1820</code>, กรอกเลขไมล์, เลือกศูนย์บริการ และเลือกวันที่แจ้งซ่อม</li>
+      <li><strong>ส่วนที่ 2 (รายการแจ้งซ่อม 1–5):</strong> พิมพ์รายการชำรุด หรือกดปุ่มแท็กด่วน เช่น <code>+ น้ำมันเครื่อง</code>, <code>+ กรองน้ำมันเครื่อง</code>, <code>+ สลับยาง 4 เส้น</code></li>
+      <li><strong>ส่วนที่ 3 (รถทดแทน):</strong> ติ๊กถูก <code>มีรถทดแทน</code> เฉพาะกรณีที่ศูนย์บริการมีรถทดแทนให้</li>
+      <li><strong>ส่วนที่ 4 (เจ้าหน้าที่ &amp; วันที่ส่งรถ):</strong> เลือก <strong>วันที่ส่งรถเข้าซ่อม</strong> จากปฏิทิน (สำหรับทะเบียน 1816 ชื่อคนขับจะสลับตามวันที่ 1–15 / 16–31 ให้อัตโนมัติ)</li>
+      <li><strong>ส่วนที่ 5 (แนบรูปภาพหน้า 2+):</strong> กดกล่อง <code>➕ คลิกเลือกรูปภาพ</code> สามารถคลุมเลือกทีเดียว <strong>5–6 รูป</strong> (หรือมากกว่า) ได้เลย ระบบจะจัดเรียงเป็นตาราง 2 คอลัมน์ลงหน้า 2 ให้อัตโนมัติ และสามารถพิมพ์คำอธิบายใต้ภาพแต่ละรูปได้</li>
+    </ul>
+
+    <h3>ขั้นตอนที่ 3: การสั่งพิมพ์และส่งออกเอกสาร (เลือกใช้ได้ 2 วิธี)</h3>
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 34%;">ปุ่มคำสั่ง</th>
+          <th>การใช้งานและข้อแนะนำ</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>📝 เปิดใน Microsoft Word ทันที</strong><br/><em>(แนะนำ — เหมือนต้นฉบับ 100%)</em></td>
+          <td>ระบบจะบันทึกข้อมูลลงฐานข้อมูล สร้างไฟล์ Word (<code>.docx</code>) ขนาด F4 พร้อมรูปหน้า 2 และเปิดโปรแกรม Microsoft Word ขึ้นมาให้สั่งพิมพ์ทันที</td>
+        </tr>
+        <tr>
+          <td><strong>💾 ดาวน์โหลดไฟล์ Word (.docx)</strong></td>
+          <td>บันทึกไฟล์ Word ลงเครื่องเพื่อส่งต่อหรือเก็บสำเนา</td>
+        </tr>
+        <tr>
+          <td><strong>🖨️ สั่งพิมพ์ผ่านเบราว์เซอร์</strong></td>
+          <td>ในหน้าต่างพิมพ์ของ Chrome/Edge ให้ตั้งค่าขนาดกระดาษเป็น <strong>F4 / Folio (8.5×13")</strong> และ <strong>เอาติ๊กถูก "ส่วนหัวและส่วนท้าย" ออก</strong></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="alert alert-tip">
+      <strong>💡 เคล็ดลับสำหรับจอคอมพิวเตอร์ขนาดใหญ่ (2K / 4K):</strong><br/>
+      หากตัวอักษรดูเล็กเกินไป สามารถกดปุ่มปรับขนาด <strong>เมนู (<code>A- / A+</code>)</strong> และซูม <strong>กระดาษ (<code>− / + / พอดีจอ</code>)</strong> ที่แถบด้านบนได้ โดยระบบจะจำค่าไว้เฉพาะเครื่องนั้น และ <strong>ไม่กระทบขนาดตอนสั่งพิมพ์จริง</strong> ครับ
+    </div>
+  </div>
+
+  <!-- ==================== หน้า 3: วิธีใช้ Dashboard & การสำรองข้อมูล ==================== -->
+  <div class="page">
+    <h2>5. วิธีใช้งานโปรแกรม Dashboard แผนกยานพาหนะ (CarService_Dashboard.exe)</h2>
+    <p>ดับเบิลคลิกที่ <code>CarService_Dashboard.exe</code> ระบบจะเปิดหน้าเว็บ <code>http://localhost:8086</code> ขึ้นมาอัตโนมัติ (สามารถเปิดพร้อมกับโปรแกรมออกใบส่งซ่อมได้โดยไม่ชนกัน)</p>
+
+    <h3>การเข้าสู่ระบบ (Login) แบ่งเป็น 2 สิทธิ์:</h3>
+    <div class="box-grid">
+      <div class="info-card">
+        <strong>🔑 โหมดเจ้าหน้าที่ (Admin)</strong>
+        • ชื่อผู้ใช้: <code>admin</code> / รหัสผ่านเริ่มต้น: <code>1234</code><br/>
+        • ดูรายงาน, อัปเดตสถานะงานซ่อม, ลบประวัติ, ส่งออก Excel และเปลี่ยนรหัสผ่านได้
+      </div>
+      <div class="info-card">
+        <strong>👁️ โหมดดูรายงานอย่างเดียว</strong>
+        • กดปุ่ม <code>เข้าดูรายงานอย่างเดียว</code> ได้เลยไม่ต้องใส่รหัส<br/>
+        • ดูกราฟ, ดูสถานะรถ, ดูรูปแนบ, ส่งออก Excel และพิมพ์รายงานได้ (แก้/ลบข้อมูลไม่ได้)
+      </div>
+    </div>
+
+    <div class="alert alert-warn">
+      <strong>🔒 แนะนำความปลอดภัย:</strong> หลังติดตั้งเสร็จ ควรเข้าสู่ระบบด้วย <code>admin / 1234</code> แล้วกดปุ่ม <strong><code>🔑 รหัสผ่าน</code></strong> ที่แถบด้านบนเพื่อเปลี่ยนเป็นรหัสผ่านเฉพาะของแผนกยานพาหนะทันที
+    </div>
+
+    <div class="screenshot-box">
+      <img src="manual_images/step2_dashboard_login.png" alt="หน้าจอ Login Dashboard" style="max-height: 66mm;" />
+      <div class="screenshot-cap">ภาพที่ 2: หน้าจอเข้าสู่ระบบ (เลือกเข้าสู่ระบบ Admin หรือกดเข้าดูรายงานอย่างเดียวโดยไม่ต้องใส่รหัส)</div>
+    </div>
+
+    <div class="screenshot-box">
+      <img src="manual_images/step3_dashboard_main.png" alt="หน้าหลัก Dashboard แผนกยานพาหนะ" style="max-height: 82mm;" />
+      <div class="screenshot-cap">ภาพที่ 3: หน้าหลัก Dashboard แสดงการ์ดสถานะรถรายคัน ส.น.ว. 1816–1820, กราฟสรุป, ตารางค้นหา และปุ่มส่งออก Excel</div>
+    </div>
+  </div>
+
+  <!-- ==================== หน้า 4: ฟีเจอร์ Dashboard & การสำรองข้อมูล ==================== -->
+  <div class="page">
+    <h2>5. (ต่อ) ความสามารถหลักในหน้า Dashboard</h2>
+    <ul>
+      <li><strong>การ์ดสถานะรถรายคัน (<code>ส.น.ว. 1816</code>–<code>1820</code>):</strong> แสดงชื่อคนขับ, สถานะ (🔧 อยู่ศูนย์ / ✅ พร้อมใช้), เลขไมล์ล่าสุด และจำนวนครั้งที่เข้าซ่อม — <strong>คลิกที่การ์ดรถเพื่อกรองดูประวัติเฉพาะคันนั้นได้ทันที</strong></li>
+      <li><strong>กราฟสรุปและรายการซ่อมยอดฮิต:</strong> เปรียบเทียบจำนวนครั้งที่ส่งซ่อมของแต่ละคัน และสรุปรายการซ่อมที่เกิดบ่อยที่สุด 5 อันดับแรก</li>
+      <li><strong>ติดตามและอัปเดตสถานะ (Admin):</strong> เปลี่ยนสถานะในตารางได้ทันที (<code>🟡 รอส่งซ่อม</code> ➔ <code>🔧 กำลังซ่อม</code> ➔ <code>✅ รับรถแล้ว</code>) โดยระบบจะลงวันที่รับรถคืนให้อัตโนมัติ</li>
+      <li><strong>ดูรูปแนบย้อนหลัง:</strong> คลิกปุ่ม <code>📸 ดูรูปแนบ</code> ในตารางเพื่อเปิดดูรูปหน้าปัดไมล์และรูปรถของใบงานนั้นๆ</li>
+      <li><strong>ส่งออกรายงาน:</strong> กด <code>📊 ส่งออก Excel</code> (เปิดใน Microsoft Excel ภาษาไทยตรง 100%) หรือ <code>🖨️ พิมพ์รายงาน</code></li>
+      <li><strong>เปิดฐานข้อมูลจากแฟลชไดรฟ์:</strong> กดปุ่ม <code>📂 เปิดไฟล์ .db อื่น</code> เพื่อเลือกเปิดดูไฟล์ <code>car_service.db</code> ที่ก๊อปปี้มาจากเครื่องอื่นได้ทันที</li>
+      <li><strong>โหมดกลางวัน / กลางคืน:</strong> กดสวิตช์พระอาทิตย์/พระจันทร์มุมขวาบนเพื่อสลับธีม Light / Dark Mode</li>
+    </ul>
+
+    <h2>6. การสำรองข้อมูล (Backup) และแก้ไขปัญหาเบื้องต้น</h2>
+    <ul>
+      <li><strong>การสำรองข้อมูลประจำเดือน:</strong> ก๊อปปี้ไฟล์ <code>car_service.db</code> และโฟลเดอร์ <code>saved_photos\</code> เก็บลงแฟลชไดรฟ์หรือไดรฟ์สำรองไว้เป็นระยะ (หากย้ายเครื่องใหม่ แค่นำ 2 อย่างนี้ไปวางข้างๆ ไฟล์ <code>.exe</code> ข้อมูลเดิมจะกลับมาครบ 100%)</li>
+      <li><strong>กรณีเปิดหน้าเว็บไม่ขึ้น / กดบันทึกไม่ได้:</strong> ตรวจสอบว่าหน้าต่างจอดำของโปรแกรมยังเปิดอยู่หรือไม่ หากเผลอปิดไปให้ดับเบิลคลิกเปิดไฟล์ <code>.exe</code> ขึ้นมาใหม่</li>
+      <li><strong>กรณีสั่งพิมพ์จากเบราว์เซอร์แล้วหัวกระดาษขาด:</strong> ตรวจสอบในหน้าต่างพิมพ์ว่าเลือกขนาดกระดาษเป็น <strong>F4 / Folio (8.5 × 13 นิ้ว)</strong> ตรงกับกระดาษในถาด หรือแนะนำให้กดปุ่ม <strong><code>📝 เปิดใน Microsoft Word ทันที</code></strong> แล้วสั่งพิมพ์จาก Word จะแม่นยำที่สุด</li>
+    </ul>
+
+    <div class="footer-note">
+      คู่มือการใช้งานระบบออกใบส่งซ่อมรถยนต์เช่า และ Dashboard — แผนกยานพาหนะ โรงเรียนจิตรลดา
+    </div>
+  </div>
+</body>
+</html>

@@ -28,3 +28,4 @@
    ```
 2. ดับเบิลคลิก `Build_EXE.bat`
 3. นำไฟล์ `dist/CarService_RepairOrder.exe` ไปใช้งานบนเครื่องอื่นได้ทันทีโดยไม่ต้องลง Python
+

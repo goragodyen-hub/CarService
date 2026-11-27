@@ -4,6 +4,7 @@
 พกพาไปใช้ได้ทุกเครื่องในรูปแบบไฟล์เดียว (ไม่ต้องติดตั้ง Database Server)
 """
 import csv
+import hashlib
 import io
 import json
 import os
@@ -12,10 +13,17 @@ import sqlite3
 DB_PATH = None
 
 
-def init_db(data_dir):
+def _hash_pw(pw):
+    return hashlib.sha256(f"carservice_salt_v1:{pw}".encode("utf-8")).hexdigest()
+
+
+def init_db(data_dir, custom_db_path=None):
     global DB_PATH
-    os.makedirs(data_dir, exist_ok=True)
-    DB_PATH = os.path.join(data_dir, "car_service.db")
+    if custom_db_path:
+        DB_PATH = os.path.abspath(custom_db_path)
+    else:
+        os.makedirs(data_dir, exist_ok=True)
+        DB_PATH = os.path.join(data_dir, "car_service.db")
 
     conn = sqlite3.connect(DB_PATH)
     try:
@@ -53,21 +61,66 @@ def init_db(data_dir):
                 photos_json TEXT
             )
         """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                username TEXT PRIMARY KEY,
+                password_hash TEXT NOT NULL,
+                display_name TEXT NOT NULL,
+                role TEXT NOT NULL DEFAULT 'admin'
+            )
+        """)
+        # สร้างบัญชี Admin เริ่มต้น (admin / 1234) หากยังไม่มี
+        cur = conn.execute("SELECT COUNT(*) FROM users")
+        if cur.fetchone()[0] == 0:
+            conn.execute(
+                "INSERT INTO users (username, password_hash, display_name, role) VALUES (?, ?, ?, ?)",
+                ("admin", _hash_pw("1234"), "ผู้ดูแลแผนกยานพาหนะ", "admin")
+            )
         conn.commit()
     finally:
         conn.close()
 
     # ย้ายข้อมูลเก่าจาก history.json (ถ้ามีและฐานข้อมูลยังว่างอยู่)
-    legacy_json = os.path.join(data_dir, "history.json")
-    if os.path.exists(legacy_json) and len(list_records()) == 0:
-        try:
-            with open(legacy_json, "r", encoding="utf-8") as f:
-                old_records = json.load(f)
-            for rec in old_records:
-                if isinstance(rec, dict) and rec.get("id"):
-                    upsert_record(rec)
-        except Exception:
-            pass
+    if not custom_db_path:
+        legacy_json = os.path.join(data_dir, "history.json")
+        if os.path.exists(legacy_json) and len(list_records()) == 0:
+            try:
+                with open(legacy_json, "r", encoding="utf-8") as f:
+                    old_records = json.load(f)
+                for rec in old_records:
+                    if isinstance(rec, dict) and rec.get("id"):
+                        upsert_record(rec)
+            except Exception:
+                pass
+
+
+def verify_user(username, password):
+    conn = sqlite3.connect(DB_PATH)
+    try:
+        row = conn.execute(
+            "SELECT username, display_name, role FROM users WHERE username = ? AND password_hash = ?",
+            (username.strip(), _hash_pw(password))
+        ).fetchone()
+        if row:
+            return {"username": row[0], "display_name": row[1], "role": row[2]}
+        return None
+    finally:
+        conn.close()
+
+
+def change_password(username, old_password, new_password):
+    if not verify_user(username, old_password):
+        return False
+    conn = sqlite3.connect(DB_PATH)
+    try:
+        conn.execute(
+            "UPDATE users SET password_hash = ? WHERE username = ?",
+            (_hash_pw(new_password), username.strip())
+        )
+        conn.commit()
+        return True
+    finally:
+        conn.close()
 
 
 def _row_to_dict(row):
